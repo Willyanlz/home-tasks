@@ -1,0 +1,62 @@
+name: Validate and publish Brasil release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -r requirements_test.txt -c https://raw.githubusercontent.com/home-assistant/core/2026.4.2/homeassistant/package_constraints.txt
+      - run: python -m pytest tests/integration/test_calendar.py tests/integration/test_calendar_recurrence.py tests/integration/test_calendar_i18n.py
+      - run: npm install --no-package-lock --ignore-scripts
+      - run: npm run build:i18n && git diff --exit-code -- custom_components/home_tasks/home-tasks-card.js
+      - run: npm run test:nocov
+      - name: Verify version and package the integration
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, zipfile
+          root = pathlib.Path('custom_components/home_tasks')
+          version = json.loads((root / 'manifest.json').read_text())['version']
+          assert os.environ['RELEASE_TAG'] == 'v' + version
+          with zipfile.ZipFile('home_tasks.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+              for path in sorted(root.rglob('*')):
+                  if path.is_file() and '__pycache__' not in path.parts and path.suffix != '.pyc':
+                      archive.write(path, path.relative_to(root))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: home-tasks-brasil
+          path: home_tasks.zip
+  hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: home-assistant/actions/hassfest@master
+  release:
+    needs: [test, hassfest]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: home-tasks-brasil
+      - name: Publish HACS release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" home_tasks.zip --verify-tag --title "Home Tasks Brasil $RELEASE_TAG" --notes-file docs/brasil-release.md

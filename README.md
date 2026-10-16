@@ -1,3 +1,13 @@
+# Home Tasks Brasil
+
+Versão independente para uso em português brasileiro, baseada em **L3t4l3s/home-tasks 2.4.0**. Créditos e licença MIT do projeto original preservados.
+
+**Instalação:** HACS → Repositórios personalizados → `https://github.com/Willyanlz/home-tasks` → categoria **Integração** → baixar **Home Tasks Brasil** → reiniciar o HA.
+
+Veja [as notas da versão e migração](docs/brasil-release.md). O domínio continua `home_tasks` e o card continua `custom:home-tasks-card`; este fork substitui a integração original. As traduções e melhorias de calendário também foram enviadas ao original no [PR #71](https://github.com/L3t4l3s/home-tasks/pull/71).
+
+---
+
 # Home Tasks
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz/)

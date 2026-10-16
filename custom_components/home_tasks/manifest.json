@@ -1,13 +1,20 @@
 {
   "domain": "home_tasks",
-  "name": "Home Tasks",
-  "after_dependencies": ["ai_task"],
-  "codeowners": ["@L3t4l3s"],
+  "name": "Home Tasks Brasil",
+  "after_dependencies": [
+    "ai_task"
+  ],
+  "codeowners": [
+    "@Willyanlz"
+  ],
   "config_flow": true,
-  "dependencies": ["frontend", "http", "todo"],
-  "documentation": "https://github.com/L3t4l3s/home-tasks",
+  "dependencies": [
+    "frontend",
+    "http",
+    "todo"
+  ],
+  "documentation": "https://github.com/Willyanlz/home-tasks",
   "integration_type": "service",
   "iot_class": "local_push",
-  "issue_tracker": "https://github.com/L3t4l3s/home-tasks/issues",
-  "version": "2.4.0"
+  "version": "2.4.1"
 }
